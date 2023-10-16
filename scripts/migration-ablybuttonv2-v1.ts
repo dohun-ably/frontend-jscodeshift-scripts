@@ -1,15 +1,16 @@
 import { API, FileInfo } from "jscodeshift";
 
-// yarn jscodeshift -t scripts/jscodeshift-fixedSize.ts ./pages/**/*.tsx --parser=tsx --dry
+// yarn jscodeshift -t scripts/script.ts ./pages/**/*.tsx --parser=tsx --dry
 const sizeMap = {
   xxl: "xlarge",
   xl: "xlarge",
   lg: "large",
   nm: "medium",
-  ms: "medium",
+  ms: "small",
   sm: "small",
   xs: "xsmall",
 };
+
 export default function transformer(file: FileInfo, api: API) {
   const j = api.jscodeshift;
   const source = j(file.source);
@@ -28,9 +29,13 @@ export default function transformer(file: FileInfo, api: API) {
     )
     .find(j.JSXAttribute)
     .filter((path) =>
-      ["textColor", "disabledBackground", "borderColor"].includes(
-        path.node.name.name
-      )
+      [
+        "textColor",
+        "disabledBackground",
+        "borderColor",
+        "spinnerColor",
+        "borderRadius",
+      ].includes(path.node.name.name)
     )
     .remove();
 
@@ -71,7 +76,11 @@ export default function transformer(file: FileInfo, api: API) {
         path.node.value.value = "pink";
       } else if (value.includes("blue")) {
         path.node.value.value = "blue";
-      } else if (value.includes("gray")) {
+      } else if (
+        value.includes("gray") ||
+        value.includes("black") ||
+        value.includes("white")
+      ) {
         path.node.value.value = "gray";
       }
     });
